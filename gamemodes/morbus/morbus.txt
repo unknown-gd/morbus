@@ -1,0 +1,7 @@
+"morbus"
+{
+	"base"		    "base"
+	"title"	    	"Morbus"
+	"maps"		    "^mor_"
+	"menusystem"	"1"
+}
