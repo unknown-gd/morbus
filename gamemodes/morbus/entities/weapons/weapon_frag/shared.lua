@@ -2,8 +2,13 @@ if (SERVER) then
     AddCSLuaFile( "shared.lua" )
 end
 
+---@class weapon_frag : SWEP
+---@field StoredAmmo integer
+local SWEP = SWEP
+
 if (CLIENT) then
     language.Add( "ent_frag_grenade", "Frag Grenade" ) --wtf
+
     SWEP.DrawCrosshair   = true
     SWEP.ViewModelFOV    = 70
     SWEP.ViewModelFlip   = true
@@ -46,19 +51,24 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
-    self.Weapon:SendWeaponAnim( ACT_VM_DRAW )
+    self:SendWeaponAnim( ACT_VM_DRAW )
     self:SetHoldType( self.HoldType )
-    if SERVER then
-        self.Owner:DrawWorldModel( false )
-        self.Owner:DrawWorldModel( false )
 
-        local ent = ents.Create( "ent_frag" )
-        ent:SetOwner( self.Owner )
-        ent:SetParent( self.Owner )
-        ent:SetPos( self.Owner:GetPos() )
-        ent:SetColor( self.Owner:GetColor() )
-        ent:SetMaterial( self.Owner:GetMaterial() )
-        ent:Spawn()
+    if SERVER then
+        local owner = self:GetOwner()
+        if owner ~= nil and owner:IsValid() then
+            ---@cast owner Player
+
+            owner:DrawWorldModel( false )
+
+            local ent = ents.Create( "ent_frag" )
+            ent:SetOwner( owner )
+            ent:SetParent( owner )
+            ent:SetPos( owner:GetPos() )
+            ent:SetColor( owner:GetColor() )
+            ent:SetMaterial( owner:GetMaterial() )
+            ent:Spawn()
+        end
     end
 
     return true
@@ -68,92 +78,110 @@ function SWEP:Reload()
 end
 
 function SWEP:PrimaryAttack()
-    self.Weapon:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
-    self.Weapon:SetNextSecondaryFire( CurTime() + self.Primary.Delay )
+    local owner = self:GetOwner()
+    if owner == nil or not owner:IsValid() then return end
+
+    ---@cast owner Player
+
+    self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
+    self:SetNextSecondaryFire( CurTime() + self.Primary.Delay )
+
     self:TakePrimaryAmmo( 1 )
-    self.Weapon:SendWeaponAnim( ACT_VM_THROW ) -- View model animation
-    self.Owner:SetAnimation( PLAYER_ATTACK1 ) -- 3rd Person Animation
+
+    self:SendWeaponAnim( ACT_VM_THROW )  -- View model animation
+    owner:SetAnimation( PLAYER_ATTACK1 ) -- 3rd Person Animation
+
     if SERVER then
         local ent = ents.Create( "ent_frag_grenade" )
 
-        ent.GrenadeOwner = self.Owner
-        ent:SetPos( self.Owner:GetShootPos() )
+        ent.GrenadeOwner = owner
+        ent:SetPos( owner:GetShootPos() )
         ent:SetAngles( Angle( 1, 0, 0 ) )
         ent:Spawn()
 
         local phys = ent:GetPhysicsObject()
-        phys:SetVelocity( self.Owner:GetAimVector() * 1000 )
-        phys:AddAngleVelocity( Vector( math.random( -50, 50 ), math.random( -50, 50 ), math.random( -50, 50 ) ) )
+        if phys ~= nil and phys:IsValid() then
+            phys:SetVelocity( owner:GetAimVector() * 1000 )
+            phys:AddAngleVelocity( Vector( math.random( -50, 50 ), math.random( -50, 50 ), math.random( -50, 50 ) ) )
+        end
     end
 
-    local gender = self.Owner:GetNWInt( "gender" )
+    local gender = owner:GetNWInt( "gender" )
     if gender == 1 then
         self:EmitSound( "vo/npc/male01/watchout.wav", 100, math.random( 95, 105 ) )
     else
         self:EmitSound( "vo/npc/Alyx/watchout02.wav", 100, math.random( 95, 105 ) )
     end
 
-    self.Weapon:SendWeaponAnim( ACT_VM_DRAW )
-    local checkAlien = self.Owner:IsAlien()
-    local owner = self.Owner
-    if self.Weapon:Clip1() < 1 and SERVER then
-        local worldmodel = ents.FindInSphere( self.Owner:GetPos(), 0.6 )
-        for k, v in pairs( worldmodel ) do
-            if v:GetClass() == "ent_frag" and v:GetOwner() == self.Owner then
+    self:SendWeaponAnim( ACT_VM_DRAW )
+
+    local checkAlien = owner:IsAlien()
+
+    if self:Clip1() < 1 and SERVER then
+        for _, v in ipairs( ents.FindInSphere( owner:GetPos(), 0.6 ) ) do
+            if v:GetClass() == "ent_frag" and v:GetOwner() == owner then
                 v:Remove()
             end
         end
 
-        self.Owner:StripWeapon( "weapon_frag" )
+        owner:StripWeapon( "weapon_frag" )
 
         if checkAlien then
             owner:SelectWeapon( "weapon_mor_crowbar" )
         else
             RunConsoleCommand( "invprev" )
         end
-
     end
 
 end
 
 function SWEP:SecondaryAttack()
-    self.Weapon:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
-    self.Weapon:SetNextSecondaryFire( CurTime() + self.Primary.Delay )
+    local owner = self:GetOwner()
+    if owner == nil or not owner:IsValid() then return end
+
+    ---@cast owner Player
+
+    self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
+    self:SetNextSecondaryFire( CurTime() + self.Primary.Delay )
+
     self:TakePrimaryAmmo( 1 )
-    self.Weapon:SendWeaponAnim( ACT_VM_THROW ) -- View model animation
-    self.Owner:SetAnimation( PLAYER_ATTACK1 )
+
+    self:SendWeaponAnim( ACT_VM_THROW ) -- View model animation
+    owner:SetAnimation( PLAYER_ATTACK1 )
+
     if SERVER then
         local ent = ents.Create( "ent_frag_grenade" )
 
-        ent.GrenadeOwner = self.Owner
-        ent:SetPos( self.Owner:GetShootPos() )
+        ent.GrenadeOwner = owner
+        ent:SetPos( owner:GetShootPos() )
         ent:SetAngles( Angle( 1, 0, 0 ) )
         ent:Spawn()
 
         local phys = ent:GetPhysicsObject()
-        phys:SetVelocity( self.Owner:GetAimVector() * 30 )
+        phys:SetVelocity( owner:GetAimVector() * 30 )
         phys:AddAngleVelocity( Vector( 0, 0, 0 ) )
     end
 
-    local gender = self.Owner:GetNWInt( "gender" )
+    local gender = owner:GetNWInt( "gender" )
     if gender == 1 then
         self:EmitSound( "vo/npc/male01/watchout.wav", 100, math.random( 95, 105 ) )
     else
         self:EmitSound( "vo/npc/Alyx/watchout02.wav", 100, math.random( 95, 105 ) )
     end
 
-    self.Weapon:SendWeaponAnim( ACT_VM_DRAW )
-    local checkAlien = self.Owner:IsAlien()
-    local owner = self.Owner
-    if self.Weapon:Clip1() < 1 and SERVER then
-        local worldmodel = ents.FindInSphere( self.Owner:GetPos(), 0.6 )
-        for k, v in pairs( worldmodel ) do
-            if v:GetClass() == "ent_frag" and v:GetOwner() == self.Owner then
+    self:SendWeaponAnim( ACT_VM_DRAW )
+
+    local checkAlien = owner:IsAlien()
+
+    if self:Clip1() < 1 and SERVER then
+        for k, v in ipairs( ents.FindInSphere( owner:GetPos(), 0.6 ) ) do
+            if v:GetClass() == "ent_frag" and v:GetOwner() == owner then
                 v:Remove()
             end
         end
 
-        self.Owner:StripWeapon( "weapon_frag" )
+        owner:StripWeapon( "weapon_frag" )
+
         if checkAlien then
             owner:SelectWeapon( "weapon_mor_crowbar" )
         else
@@ -164,13 +192,11 @@ function SWEP:SecondaryAttack()
 end
 
 function SWEP:Holster()
-    if not self.Owner then return end
+    local owner = self:GetOwner()
+    if owner == nil or not owner:IsValid() then return end
 
-    if not IsValid( self.Owner ) then return end
-
-    local worldmodel = ents.FindInSphere( self.Owner:GetPos(), 0.6 )
-    for k, v in pairs( worldmodel ) do
-        if v:GetClass() == "ent_frag" and v:GetOwner() == self.Owner then
+    for _, v in ipairs( ents.FindInSphere( owner:GetPos(), 0.6 ) ) do
+        if v:GetClass() == "ent_frag" and v:GetOwner() == owner then
             if SERVER then
                 v:Remove()
             end
@@ -178,19 +204,29 @@ function SWEP:Holster()
     end
 
     return true
-
 end
 
+---@return integer
 function SWEP:Ammo1()
-    return IsValid( self.Owner ) and self.Owner:GetAmmoCount( self.Primary.Ammo ) or false
+    local owner = self:GetOwner()
+    if owner == nil or not owner:IsValid() then return 0 end
+
+    ---@cast owner Player
+
+    return owner:GetAmmoCount( self.Primary.Ammo )
 end
 
 function SWEP:PreDrop()
-    if SERVER and IsValid( self.Owner ) and self.Primary.Ammo ~= "none" then
+    local owner = self:GetOwner()
+    if owner == nil or not owner:IsValid() then return end
+
+    ---@cast owner Player
+
+    if SERVER and self.Primary.Ammo ~= "none" then
         local ammo = self:Ammo1()
 
         -- Do not drop ammo if we have another gun that uses this type
-        for _, w in pairs( self.Owner:GetWeapons() ) do
+        for _, w in ipairs( owner:GetWeapons() ) do
             if IsValid( w ) and w ~= self and w:GetPrimaryAmmoType() == self:GetPrimaryAmmoType() then
                 ammo = 0
             end
@@ -199,14 +235,13 @@ function SWEP:PreDrop()
         self.StoredAmmo = ammo
 
         if ammo > 0 then
-            self.Owner:RemoveAmmo( ammo, self.Primary.Ammo )
+            owner:RemoveAmmo( ammo, self.Primary.Ammo )
         end
 
     end
 
-    local worldmodel = ents.FindInSphere( self.Owner:GetPos(), 0.6 )
-    for k, v in pairs( worldmodel ) do
-        if v:GetClass() == "ent_frag" and v:GetOwner() == self.Owner then
+    for _, v in ipairs( ents.FindInSphere( owner:GetPos(), 0.6 ) ) do
+        if v:GetClass() == "ent_frag" and v:GetOwner() == owner then
             v:Remove()
         end
     end
@@ -220,6 +255,7 @@ function SWEP:DampenDrop()
     end
 end
 
+---@param newowner Player
 function SWEP:Equip( newowner )
     if SERVER then
         if self:IsOnFire() then

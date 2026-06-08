@@ -1,3 +1,4 @@
+---@class Player
 local plymeta = FindMetaTable( "Player" )
 if not plymeta then return end
 
@@ -88,7 +89,7 @@ end
 function plymeta:CanCarryType( t )
     if not t then return false end
 
-    for _, w in pairs( self:GetWeapons() ) do
+    for _, w in ipairs( self:GetWeapons() ) do
         if w.Kind and w.Kind == t then
             return false
         end

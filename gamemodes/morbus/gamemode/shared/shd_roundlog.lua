@@ -87,13 +87,13 @@ if SERVER then
         end
 
         file.Append( "Morbus/logs/" .. game.GetMap() .. "/" .. "round_log_" .. tostring( os.date( "%m-%d_%H-%M" ) ) .. ".txt", "#### MORBUS ROUND LOG ####\n" .. os.date() .. "\n" )
-        for k, v in pairs( Round_Log ) do
+        for _, v in ipairs( Round_Log ) do
             file.Append( "Morbus/logs/" .. game.GetMap() .. "/" .. "round_log_" .. tostring( os.date( "%m-%d_%H-%M" ) ) .. ".txt", "[" .. v.
             Time .. "] [" .. v.Type .. "] " .. v.Text .. "\n" )
         end
 
         file.Append( "Morbus/logs/" .. game.GetMap() .. "/" .. "round_log_" .. tostring( os.date( "%m-%d_%H-%M" ) ) .. ".txt", "#### PLAYER STEAM ID's ####\n" )
-        for k, v in pairs( Round_IDs ) do
+        for _, v in ipairs( Round_IDs ) do
             file.Append( "Morbus/logs/" .. game.GetMap() .. "/" .. "round_log_" .. tostring( os.date( "%m-%d_%H-%M" ) ) .. ".txt", "[" .. v[ 1 ] .. "] " .. v[ 2 ] .. "\n" )
         end
     end

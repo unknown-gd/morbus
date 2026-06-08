@@ -1,7 +1,9 @@
+---@return Player[]
 function util.GetAlivePlayers()
     local alive = {}
-    for k, p in player.Iterator() do
-        if IsValid( p ) and p:Alive() and (p:Team() ~= TEAM_SPEC) then
+
+    for _, p in player.Iterator() do
+        if IsValid( p ) and p:Alive() and p:Team() ~= TEAM_SPEC then
             table.insert( alive, p )
         end
     end
@@ -34,7 +36,7 @@ function util.GetNextAlivePlayer( ply )
     local choice = nil
 
     if IsValid( ply ) then
-        for k, p in pairs( alive ) do
+        for _, p in ipairs( alive ) do
             if prev == ply then
                 choice = p
             end
@@ -91,6 +93,7 @@ end
 
 local math = math
 local rand = math.random
+
 function table.Shuffle( t )
     local n = #t
 

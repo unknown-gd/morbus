@@ -158,7 +158,7 @@ util.PrecacheModel( Models.Brood )
 util.PrecacheModel( Models.Swarm )
 
 local function LoadModels( tab )
-    for k, v in pairs( tab ) do
+    for k, v in ipairs( tab ) do
         util.PrecacheModel( v )
     end
 end

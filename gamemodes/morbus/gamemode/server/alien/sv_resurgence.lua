@@ -15,7 +15,7 @@ local Allow_Bots = true
 local function ChooseNewAliens()
     local choices = {}
 
-    for k, v in pairs( GetHumanList() ) do
+    for k, v in ipairs( GetHumanList() ) do
         if IsValid( v ) then
             if (Allow_Bots and v:IsBot()) or not v:IsBot() then
                 if v:GetBaseSanity() > 500 and not v:IsCyborg() then

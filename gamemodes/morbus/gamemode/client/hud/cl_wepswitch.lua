@@ -5,7 +5,7 @@ WEAPON SWITCH INTERFACE
 -- Morbus - morbus.remscar.com
 -- Developed by Remscar and the Morbus dev team
 
-local tex = surface.GetTextureID("vgui/morbus/HPBar")
+local tex = surface.GetTextureID( "vgui/morbus/HPBar" )
 
 
 WSWITCH = {}
@@ -15,7 +15,7 @@ WSWITCH.Selected = -1
 WSWITCH.NextSwitch = -1
 WSWITCH.WeaponCache = {}
 
-CreateClientConVar("mor_ignore_brood", 0)
+CreateClientConVar( "mor_ignore_brood", "0" )
 
 local delay = 0.075
 local showtime = 3
@@ -26,20 +26,22 @@ local height = 20
 
 local COLORS_TEXT = {
 
-    bg = Color(20, 20, 20, 255),
+    bg = Color( 20, 20, 20, 255 ),
 
-    text_empty = Color(200, 20, 20, 100),
-    text = Color(255, 255, 255, 130),
+    text_empty = Color( 200, 20, 20, 100 ),
+    text = Color( 255, 255, 255, 130 ),
 
     shadow = 100
 }
 
 local round = math.Round
-function WSWITCH:DrawBarBg(x, y, w, h, col)
-    local rx = round(x - 4)
-    local ry = round(y - (h / 2) - 4)
-    local rw = round(w + 9)
-    local rh = round(h + 8)
+local current
+
+function WSWITCH:DrawBarBg( x, y, w, h, col )
+    local rx = round( x - 4 )
+    local ry = round( y - (h / 2) - 4 )
+    local rw = round( w + 9 )
+    local rh = round( h + 8 )
 
     local b = 8 --bordersize
     local bh = b / 2
@@ -47,74 +49,74 @@ function WSWITCH:DrawBarBg(x, y, w, h, col)
 
     c = col.bg
 
-    surface.SetDrawColor(c.r, c.g, c.b, c.a)
+    surface.SetDrawColor( c.r, c.g, c.b, c.a )
 
     if (self.Selected == current) then
         if ply:IsAlien() then
-            if not GetConVar("morbus_alienhud_disable"):GetBool() then
-                if not GetConVar("morbus_alienhud_purple"):GetBool() then
-                    surface.SetDrawColor(255, 75, 75, 220)
+            if not GetConVar( "morbus_alienhud_disable" ):GetBool() then
+                if not GetConVar( "morbus_alienhud_purple" ):GetBool() then
+                    surface.SetDrawColor( 255, 75, 75, 220 )
                 else
-                    surface.SetDrawColor(190, 85, 255, 220)
+                    surface.SetDrawColor( 190, 85, 255, 220 )
                 end
             else
-                surface.SetDrawColor(100, 215, 255, 220)
+                surface.SetDrawColor( 100, 215, 255, 220 )
             end
         else
-            surface.SetDrawColor(100, 215, 255, 220)
+            surface.SetDrawColor( 100, 215, 255, 220 )
         end
 
-        surface.SetTexture(tex)
-        surface.DrawTexturedRect(rx + b + h - 4, ry, rw - (h - 4) - b * 2, rh)
+        surface.SetTexture( tex )
+        surface.DrawTexturedRect( rx + b + h - 4, ry, rw - (h - 4) - b * 2, rh )
     else
         if ply:IsAlien() then
-            if not GetConVar("morbus_alienhud_disable"):GetBool() then
-                if not GetConVar("morbus_alienhud_purple"):GetBool() then
-                    surface.SetDrawColor(215, 55, 55, 120)
+            if not GetConVar( "morbus_alienhud_disable" ):GetBool() then
+                if not GetConVar( "morbus_alienhud_purple" ):GetBool() then
+                    surface.SetDrawColor( 215, 55, 55, 120 )
                 else
-                    surface.SetDrawColor(165, 25, 255, 120)
+                    surface.SetDrawColor( 165, 25, 255, 120 )
                 end
             else
-                surface.SetDrawColor(40, 175, 235, 120)
+                surface.SetDrawColor( 40, 175, 235, 120 )
             end
         else
-            surface.SetDrawColor(40, 175, 235, 120)
+            surface.SetDrawColor( 40, 175, 235, 120 )
         end
 
-        surface.SetTexture(tex)
-        surface.DrawTexturedRect(rx + b + h - 4, ry, rw - (h - 4) - b * 2, rh)
+        surface.SetTexture( tex )
+        surface.DrawTexturedRect( rx + b + h - 4, ry, rw - (h - 4) - b * 2, rh )
     end
 
-    draw.RoundedBox(0, x + 28, ry + 1, 12, rh - 2, Color(0, 0, 0, 140))
+    draw.RoundedBox( 0, x + 28, ry + 1, 12, rh - 2, Color( 0, 0, 0, 140 ) )
 end
 
-surface.CreateFont("SEL_WEPFONT", {
+surface.CreateFont( "SEL_WEPFONT", {
     font      = "Verdana",
     size      = 22,
     weight    = 400,
     antialias = true
-})
+} )
 
-surface.CreateFont("USEL_WEPFONT", {
+surface.CreateFont( "USEL_WEPFONT", {
     font      = "Tahoma",
-    size      = ScreenScale(6),
+    size      = ScreenScale( 6 ),
     weight    = 400,
     antialias = true
-})
+} )
 
-function WSWITCH:DrawWeapon(x, y, c, wep, w, h)
-    if not IsValid(wep) then return false end
+function WSWITCH:DrawWeapon( x, y, c, wep, w, h )
+    if not IsValid( wep ) then return false end
 
     if not wep:Ammo1() then return false end
 
     local name = wep:GetPrintName() or wep.PrintName or "..."
     local cl1, am1 = wep:Clip1(), wep:Ammo1()
-    local ammo = false
+    local ammo
 
     -- Clip1 will be -1 if a melee weapon
     -- Ammo1 will be false if weapon has no owner (was just dropped)
     if cl1 ~= -1 and am1 ~= false then
-        ammo = Format("%i / %0i", cl1, am1)
+        ammo = Format( "%i / %0i", cl1, am1 )
     end
 
     -- Slot
@@ -125,15 +127,22 @@ function WSWITCH:DrawWeapon(x, y, c, wep, w, h)
     --    FONT = "USEL_WEPFONT"
     -- end
 
-    local spec = { text = wep.Slot + 1, font = FONT, pos = { x + 28, y }, xalign = TEXT_ALIGN_LEFT, yalign =
-    TEXT_ALIGN_CENTER, color = c.text }
-    draw.TextShadow(spec, 1, c.shadow)
+    local spec = {
+        text = wep.Slot + 1,
+        font = FONT,
+        pos = { x + 28, y },
+        xalign = TEXT_ALIGN_LEFT,
+        yalign =
+            TEXT_ALIGN_CENTER,
+        color = c.text
+    }
+    draw.TextShadow( spec, 1, c.shadow )
 
     -- Name
     spec.text     = name
     spec.font     = FONT
-    spec.pos[1]   = x + 46
-    draw.Text(spec)
+    spec.pos[ 1 ] = x + 46
+    draw.Text( spec )
 
     if ammo then
         local col = c.text
@@ -142,10 +151,10 @@ function WSWITCH:DrawWeapon(x, y, c, wep, w, h)
             col = c.text_empty
         end
 
-        local rx = round(x - 4)
-        local ry = round(y - (h / 2) - 4)
-        local rw = round(w + 9)
-        local rh = round(h + 8)
+        local rx = round( x - 4 )
+        local ry = round( y - (h / 2) - 4 )
+        local rw = round( w + 9 )
+        local rh = round( h + 8 )
 
         local b = 8 --bordersize
         local bh = b / 2
@@ -153,20 +162,20 @@ function WSWITCH:DrawWeapon(x, y, c, wep, w, h)
         --surface.SetFont(FONT)
         --local tw = surface.GetTextSize(ammo)
 
-        draw.RoundedBox(0, x + w - (w / 4) - 4, ry + 1, w / 4 - 2, rh, Color(0, 0, 0, 140))
+        draw.RoundedBox( 0, x + w - (w / 4) - 4, ry + 1, w / 4 - 2, rh, Color( 0, 0, 0, 140 ) )
 
         -- Ammo
         spec.text     = ammo
-        spec.pos[1]   = x + w - (w / 4)
+        spec.pos[ 1 ] = x + w - (w / 4)
         spec.xalign   = TEXT_ALIGN_LEFT
         spec.color    = col
-        draw.Text(spec)
+        draw.Text( spec )
     end
 
     return true
 end
 
-function WSWITCH:Draw(client)
+function WSWITCH:Draw( client )
     if not self.Show then return end
 
     local weps = self.WeaponCache
@@ -175,12 +184,12 @@ function WSWITCH:Draw(client)
     local y = ScrH() - (#weps * (height + margin))
 
     local col = COLORS_TEXT
-    for k, wep in pairs(weps) do
+    for k, wep in pairs( weps ) do
         current = k
 
 
-        self:DrawBarBg(x, y, width, height, col)
-        if not self:DrawWeapon(x, y, col, wep, width, height) then
+        self:DrawBarBg( x, y, width, height, col )
+        if not self:DrawWeapon( x, y, col, wep, width, height ) then
             self:UpdateWeaponCache()
             return
         end
@@ -189,27 +198,27 @@ function WSWITCH:Draw(client)
     end
 end
 
-local function SlotSort(a, b)
+local function SlotSort( a, b )
     return a and b and a.Slot and b.Slot and a.Slot < b.Slot
 end
 
-local function CopyVals(src, dest)
-    table.Empty(dest)
-    for k, v in pairs(src) do
-        if IsValid(v) then
-            table.insert(dest, v)
+local function CopyVals( src, dest )
+    table.Empty( dest )
+    for k, v in pairs( src ) do
+        if IsValid( v ) then
+            table.insert( dest, v )
         end
     end
 end
 
 function WSWITCH:UpdateWeaponCache()
     self.WeaponCache = {}
-    CopyVals(LocalPlayer():GetWeapons(), self.WeaponCache)
+    CopyVals( LocalPlayer():GetWeapons(), self.WeaponCache )
 
-    table.sort(self.WeaponCache, SlotSort)
+    table.sort( self.WeaponCache, SlotSort )
 end
 
-function WSWITCH:SetSelected(idx)
+function WSWITCH:SetSelected( idx )
     self.Selected = idx
 
     self:UpdateWeaponCache()
@@ -225,7 +234,7 @@ function WSWITCH:SelectNext()
         s = 1
     end
 
-    self:DoSelect(s, self.Selected)
+    self:DoSelect( s, self.Selected )
 
     self.NextSwitch = CurTime() + delay
 end
@@ -240,26 +249,26 @@ function WSWITCH:SelectPrev()
         s = #self.WeaponCache
     end
 
-    self:DoSelect(s, self.Selected)
+    self:DoSelect( s, self.Selected )
 
     self.NextSwitch = CurTime() + delay
 end
 
 -- Select by index
-function WSWITCH:DoSelect(idx, old)
-    self:SetSelected(idx)
+function WSWITCH:DoSelect( idx, old )
+    self:SetSelected( idx )
 
 
 
-    if GetConVar("hud_fastswitch"):GetBool() then
-        if self.WeaponCache[self.Selected]:GetClass() ~= "weapon_mor_brood" then
+    if GetConVar( "hud_fastswitch" ):GetBool() then
+        if self.WeaponCache[ self.Selected ]:GetClass() ~= "weapon_mor_brood" then
             self:ConfirmSelection()
         else
-            if GetConVar("mor_ignore_brood"):GetBool() then
+            if GetConVar( "mor_ignore_brood" ):GetBool() then
                 if idx > old and old ~= 1 then
                     self:SelectNext()
                 else
-                    self:DoSelect(#self.WeaponCache - 1)
+                    self:DoSelect( #self.WeaponCache - 1 )
                 end
             else
 
@@ -269,7 +278,7 @@ function WSWITCH:DoSelect(idx, old)
 end
 
 -- Numeric key access to direct slots
-function WSWITCH:SelectSlot(slot)
+function WSWITCH:SelectSlot( slot )
     if not slot then return end
 
     self:Enable()
@@ -280,14 +289,14 @@ function WSWITCH:SelectSlot(slot)
 
     -- find which idx in the weapon table has the slot we want
     local toselect = self.Selected
-    for k, w in pairs(self.WeaponCache) do
+    for k, w in pairs( self.WeaponCache ) do
         if w.Slot == slot then
             toselect = k
             break
         end
     end
 
-    self:SetSelected(toselect)
+    self:SetSelected( toselect )
 
     self.NextSwitch = CurTime() + delay
 end
@@ -303,14 +312,14 @@ function WSWITCH:Enable()
 
         -- make our active weapon the initial selection
         local toselect = 1
-        for k, w in pairs(self.WeaponCache) do
+        for k, w in pairs( self.WeaponCache ) do
             if w == wep_active then
                 toselect = k
                 break
             end
         end
 
-        self:SetSelected(toselect)
+        self:SetSelected( toselect )
     end
 end
 
@@ -322,9 +331,9 @@ end
 -- Switch to the currently selected weapon
 function WSWITCH:ConfirmSelection()
     self:Disable()
-    for k, w in pairs(self.WeaponCache) do
-        if k == self.Selected and IsValid(w) then
-            RunConsoleCommand("wepswitch", w:GetClass())
+    for k, w in pairs( self.WeaponCache ) do
+        if k == self.Selected and IsValid( w ) then
+            RunConsoleCommand( "wepswitch", w:GetClass() )
             return
         end
     end
@@ -340,32 +349,32 @@ function WSWITCH:Think()
 end
 
 -- Instantly select a slot and switch to it, without spending time in menu
-function WSWITCH:SelectAndConfirm(slot)
+function WSWITCH:SelectAndConfirm( slot )
     if not slot then return end
 
-    WSWITCH:SelectSlot(slot)
+    WSWITCH:SelectSlot( slot )
     WSWITCH:ConfirmSelection()
 end
 
-local function QuickSlot(ply, cmd, args)
-    if (not IsValid(ply)) or (not args) or #args ~= 1 then return end
+local function QuickSlot( ply, cmd, args )
+    if (not IsValid( ply )) or (not args) or #args ~= 1 then return end
 
-    local slot = tonumber(args[1])
+    local slot = tonumber( args[ 1 ] )
     if not slot then return end
 
     local wep = ply:GetActiveWeapon()
-    if IsValid(wep) then
+    if IsValid( wep ) then
         if wep.Slot == (slot - 1) then
-            RunConsoleCommand("lastinv")
+            RunConsoleCommand( "lastinv" )
         else
-            WSWITCH:SelectAndConfirm(slot)
+            WSWITCH:SelectAndConfirm( slot )
         end
     end
 end
-concommand.Add("morbus_quickslot", QuickSlot)
+concommand.Add( "morbus_quickslot", QuickSlot )
 
 
-local function SwitchToEquipment(ply, cmd, args)
-    RunConsoleCommand("morbus_quickslot", tostring(8))
+local function SwitchToEquipment( ply, cmd, args )
+    RunConsoleCommand( "morbus_quickslot", tostring( 8 ) )
 end
-concommand.Add("morbus_equipswitch", SwitchToEquipment)
+concommand.Add( "morbus_equipswitch", SwitchToEquipment )

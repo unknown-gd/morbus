@@ -72,7 +72,7 @@ function SWEP:PrimaryAttack()
     self.Weapon:SetNextSecondaryFire( CurTime() + self.Primary.Delay )
     self:TakePrimaryAmmo( 1 )
     self.Weapon:SendWeaponAnim( ACT_VM_THROW ) -- View model animation
-    self.Owner:SetAnimation( PLAYER_ATTACK1 ) -- 3rd Person Animation
+    self.Owner:SetAnimation( PLAYER_ATTACK1 )  -- 3rd Person Animation
     if SERVER then
         local ent = ents.Create( "ent_bglowstick_fly" )
 
@@ -91,8 +91,7 @@ function SWEP:PrimaryAttack()
     local owner = self.Owner
     if self.Weapon:Clip1() < 1 and SERVER then
 
-        local worldmodel = ents.FindInSphere( self.Owner:GetPos(), 0.6 )
-        for k, v in pairs( worldmodel ) do
+        for _, v in ipairs( ents.FindInSphere( self.Owner:GetPos(), 0.6 ) ) do
             if v:GetClass() == "ent_bglowstick" and v:GetOwner() == self.Owner then
                 v:Remove()
             end
@@ -130,8 +129,7 @@ function SWEP:SecondaryAttack()
     local checkAlien = self.Owner:IsAlien()
     local owner = self.Owner
     if self.Weapon:Clip1() < 1 and SERVER then
-        local worldmodel = ents.FindInSphere( self.Owner:GetPos(), 0.6 )
-        for k, v in pairs( worldmodel ) do
+        for _, v in ipairs( ents.FindInSphere( self.Owner:GetPos(), 0.6 ) ) do
             if v:GetClass() == "ent_bglowstick" and v:GetOwner() == self.Owner then
                 v:Remove()
             end
@@ -149,13 +147,12 @@ function SWEP:SecondaryAttack()
 end
 
 function SWEP:Holster()
-    if not  self.Owner then return end
+    if not self.Owner then return end
 
-    if not  IsValid( self.Owner ) then return end
+    if not IsValid( self.Owner ) then return end
 
     if SERVER then
-        local worldmodel = ents.FindInSphere( self.Owner:GetPos(), 0.6 )
-        for k, v in pairs( worldmodel ) do
+        for _, v in ipairs( ents.FindInSphere( self.Owner:GetPos(), 0.6 ) ) do
             if v:GetClass() == "ent_bglowstick" and v:GetOwner() == self.Owner then
                 v:Remove()
             end
@@ -175,7 +172,7 @@ function SWEP:PreDrop()
         local ammo = self:Ammo1()
 
         -- Do not drop ammo if we have another gun that uses this type
-        for _, w in pairs( self.Owner:GetWeapons() ) do
+        for _, w in ipairs( self.Owner:GetWeapons() ) do
             if IsValid( w ) and w ~= self and w:GetPrimaryAmmoType() == self:GetPrimaryAmmoType() then
                 ammo = 0
             end
@@ -189,8 +186,8 @@ function SWEP:PreDrop()
 
     end
 
-    local worldmodel = ents.FindInSphere( self.Owner:GetPos(), 0.6 )
-    for k, v in pairs( worldmodel ) do
+    for _, v in ipairs( ents.FindInSphere( self.Owner:GetPos(), 0.6 ) ) do
+
         if v:GetClass() == "ent_bglowstick" and v:GetOwner() == self.Owner then
             v:Remove()
         end

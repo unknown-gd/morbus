@@ -17,7 +17,11 @@
       "/**/",
       "continue"
     ],
-    "Lua.diagnostics.disable": ["duplicate-set-field", "lowercase-global"]
+    "Lua.diagnostics.disable": [
+      "duplicate-set-field",
+      "lowercase-global",
+      "inject-fiel"
+    ]
   },
   "format.enable": true,
   "workspace.library": ["~/.lib/glua-api-snippets/library"]

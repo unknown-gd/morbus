@@ -131,6 +131,7 @@ function PlayerFilter()
     return GetPlayerFilter( function( p ) return IsValid( p ) end )
 end
 
+---@return Player[]
 function GetPlayerList()
     local trs = {}
     for k, v in player.Iterator() do
@@ -140,6 +141,7 @@ function GetPlayerList()
     return trs
 end
 
+---@return Player[]
 function GetAlienList()
     local trs = {}
     for k, v in player.Iterator() do
@@ -149,6 +151,7 @@ function GetAlienList()
     return trs
 end
 
+---@return Player[]
 function GetHumanList()
     local trs = {}
     for k, v in player.Iterator() do
@@ -158,6 +161,7 @@ function GetHumanList()
     return trs
 end
 
+---@return Player[]
 function GetCyborgList()
     local trs = {}
     for k, v in player.Iterator() do
@@ -167,6 +171,7 @@ function GetCyborgList()
     return trs
 end
 
+---@return Player[]
 function GetSpectatorList()
     local trs = {}
     for k, v in player.Iterator() do
@@ -176,8 +181,10 @@ function GetSpectatorList()
     return trs
 end
 
+---@return Player[]
 function GetSwarmList()
     local trs = {}
+
     for k, v in player.Iterator() do
         if v:IsSwarm() and v:IsGame() then table.insert( trs, v ) end
     end
@@ -185,6 +192,7 @@ function GetSwarmList()
     return trs
 end
 
+---@return Player[]
 function GetBroodList()
     local trs = {}
     for k, v in player.Iterator() do

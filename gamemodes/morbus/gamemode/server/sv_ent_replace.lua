@@ -116,21 +116,20 @@ end
 
 local SpawnableSWEPs = nil
 local RandomSpawnableSWEPs = nil
+
+---@return SWEP[]
 function ents.MORBUS.GetSpawnableSWEPs( random )
-    if not SpawnableSWEPs then
-        local tbl = {}
-        local rtbl = {}
-        for k, v in pairs( weapons.GetList() ) do
+    if SpawnableSWEPs == nil or RandomSpawnableSWEPs == nil then
+        SpawnableSWEPs, RandomSpawnableSWEPs = {}, {}
+
+        for _, v in ipairs( weapons.GetList() ) do
             if v and v.AutoSpawnable and v.Primary.RPM and (not WEPS.IsEquipment( v )) then
-                table.insert( tbl, v )
+                table.insert( SpawnableSWEPs, v )
                 if not v.NeverRandom then
-                    table.insert( rtbl, v )
+                    table.insert( RandomSpawnableSWEPs, v )
                 end
             end
         end
-
-        SpawnableSWEPs = tbl
-        RandomSpawnableSWEPs = rtbl
     end
 
     if random then
@@ -166,34 +165,34 @@ function ents.MORBUS.GetSpawnableAmmo( random )
     end
 end
 
-local function PlaceWeapon( swep, pos, ang )
-    local cls = swep and swep.Classname
-    if not cls then return end
+-- local function PlaceWeapon( swep, pos, ang )
+--     local cls = swep and swep.Classname
+--     if not cls then return end
 
-    -- Create the weapon, somewhat in the air in case the spot hugs the ground.
-    local ent = ents.Create( cls )
-    pos.z = pos.z + 3
-    ent:SetPos( pos )
-    ent:SetAngles( VectorRand():Angle() )
-    ent:Spawn()
+--     -- Create the weapon, somewhat in the air in case the spot hugs the ground.
+--     local ent = ents.Create( cls )
+--     pos.z = pos.z + 3
+--     ent:SetPos( pos )
+--     ent:SetAngles( VectorRand():Angle() )
+--     ent:Spawn()
 
-    -- Create some associated ammo (if any)
-    if ent.AmmoEnt then
-        for i = 1, math.random( 0, 3 ) do
-            local ammo = ents.Create( ent.AmmoEnt )
+--     -- Create some associated ammo (if any)
+--     if ent.AmmoEnt then
+--         for i = 1, math.random( 0, 3 ) do
+--             local ammo = ents.Create( ent.AmmoEnt )
 
-            if IsValid( ammo ) then
-                pos.z = pos.z + 2
-                ammo:SetPos( pos )
-                ammo:SetAngles( VectorRand():Angle() )
-                ammo:Spawn()
-                ammo:PhysWake()
-            end
-        end
-    end
+--             if IsValid( ammo ) then
+--                 pos.z = pos.z + 2
+--                 ammo:SetPos( pos )
+--                 ammo:SetAngles( VectorRand():Angle() )
+--                 ammo:Spawn()
+--                 ammo:PhysWake()
+--             end
+--         end
+--     end
 
-    return ent
-end
+--     return ent
+-- end
 
 local function RemoveWeaponEntities()
     for _, cls in pairs( ents.MORBUS.GetSpawnableAmmo() ) do
