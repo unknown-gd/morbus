@@ -77,7 +77,7 @@ function SWEP:ShootBullet( damage, recoil, num_bullets, aimcone )
     bullet.Dir        = self.Owner:GetAimVector()     -- Dir of bullet
     bullet.Spread     = Vector( aimcone, aimcone, 0 ) -- Aim Cone
     bullet.Tracer     = 1                             -- Show a tracer on every x bullets
-    bullet.TracerName = "TracerGauss"
+    bullet.TracerName = "tracergauss"
     bullet.Force      = damage * 0.5                  -- Amount of force to give to phys objects
     bullet.Damage     = damage
     bullet.Callback   = function( attacker, tracedata, dmginfo )
